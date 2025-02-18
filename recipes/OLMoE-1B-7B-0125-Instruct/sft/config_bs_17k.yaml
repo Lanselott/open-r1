@@ -1,0 +1,44 @@
+# Model arguments
+model_name_or_path: allenai/OLMoE-1B-7B-0125-Instruct
+model_revision: main
+torch_dtype: bfloat16
+attn_implementation: flash_attention_2
+
+# Data training arguments
+dataset_name: HuggingFaceH4/Bespoke-Stratos-17k
+dataset_configs:
+- all
+dataset_train_split: train
+#dataset_train_split: train
+preprocessing_num_workers: 8
+
+# SFT trainer config
+bf16: true
+do_eval: false
+eval_strategy: "no"
+eval_steps: 100
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+hub_model_id: OLMoE-1B-7B-0125-Instruct-Distill-bs17k-batch32
+hub_strategy: every_save
+learning_rate: 2.0e-05
+log_level: info
+logging_steps: 5
+logging_strategy: steps
+lr_scheduler_type: cosine
+packing: true
+max_seq_length: 4096
+max_steps: -1
+num_train_epochs: 1
+output_dir: data/OLMoE-1B-7B-0125-Instruct-Distill-bs17k-batch32
+overwrite_output_dir: true
+per_device_eval_batch_size: 4
+per_device_train_batch_size: 4
+push_to_hub: true
+report_to:
+- wandb
+save_strategy: "no"
+seed: 42
+warmup_ratio: 0.1
