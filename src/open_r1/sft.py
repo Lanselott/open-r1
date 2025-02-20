@@ -40,6 +40,7 @@ import os
 import sys
 
 import datasets
+
 import torch
 import transformers
 from datasets import load_dataset
@@ -62,7 +63,6 @@ from trl import (
 
 
 logger = logging.getLogger(__name__)
-
 
 def main(script_args, training_args, model_args):
     # Set seed for reproducibility
@@ -193,6 +193,13 @@ def main(script_args, training_args, model_args):
 
 
 if __name__ == "__main__":
+    from datetime import timedelta
+    from accelerate import Accelerator
+    from accelerate.utils import InitProcessGroupKwargs
+
+    kwargs = InitProcessGroupKwargs(timeout=timedelta(seconds=86400))
+    accelerator = Accelerator(kwargs_handlers=[kwargs])
+
     parser = TrlParser((ScriptArguments, SFTConfig, ModelConfig))
     script_args, training_args, model_args = parser.parse_args_and_config()
     main(script_args, training_args, model_args)
