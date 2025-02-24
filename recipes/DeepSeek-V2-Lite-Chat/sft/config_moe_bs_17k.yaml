@@ -1,11 +1,11 @@
 # Model arguments
-model_name_or_path: Qwen/Qwen2.5-3B-Instruct
+model_name_or_path: deepseek-ai/DeepSeek-V2-Lite-Chat
 model_revision: main
 torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 
 # Data training arguments
-dataset_name: open-thoughts/OpenThoughts-114k
+dataset_name: HuggingFaceH4/Bespoke-Stratos-17k
 dataset_configs:
 - all
 dataset_train_split: train
@@ -20,7 +20,7 @@ gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
-hub_model_id: Qwen2.5-3B-Instruct-Distill-ot114k-batch32
+hub_model_id: deepseek-v2-lite-16b-chat-R1-Distill-bs17k-batch32
 hub_strategy: every_save
 learning_rate: 2.0e-05
 log_level: info
@@ -31,9 +31,9 @@ packing: true
 max_seq_length: 4096
 max_steps: -1
 num_train_epochs: 1
-output_dir: data/Qwen2.5-3B-Instruct-Distill-ot114k-batch32
+output_dir: data/deepseek-v2-lite-16b-chat-R1-Distill-bs17k-batch32
 overwrite_output_dir: true
-per_device_eval_batch_size: 4
+per_device_eval_batch_size: 2
 per_device_train_batch_size: 4
 push_to_hub: true
 report_to:

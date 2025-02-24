@@ -1,13 +1,14 @@
 # Model arguments
-model_name_or_path: Qwen/Qwen2.5-3B-Instruct
+model_name_or_path: allenai/OLMoE-1B-7B-0125-Instruct
 model_revision: main
 torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 
 # Data training arguments
-dataset_name: open-thoughts/OpenThoughts-114k
+dataset_name: open-r1/OpenR1-Math-220k
 dataset_configs:
 - all
+dataset_config: all
 dataset_train_split: train
 preprocessing_num_workers: 8
 
@@ -20,7 +21,7 @@ gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
-hub_model_id: Qwen2.5-3B-Instruct-Distill-ot114k-batch32
+hub_model_id: OLMoE-1B-7B-0125-Instruct-Distill-or-math220k-batch32
 hub_strategy: every_save
 learning_rate: 2.0e-05
 log_level: info
@@ -31,7 +32,7 @@ packing: true
 max_seq_length: 4096
 max_steps: -1
 num_train_epochs: 1
-output_dir: data/Qwen2.5-3B-Instruct-Distill-ot114k-batch32
+output_dir: data/OLMoE-1B-7B-0125-Instruct-Distill-or-math220k-batch32
 overwrite_output_dir: true
 per_device_eval_batch_size: 4
 per_device_train_batch_size: 4

@@ -8,18 +8,19 @@ attn_implementation: flash_attention_2
 dataset_name: open-thoughts/OpenThoughts-114k
 dataset_configs:
 - all
+dataset_train_split: train
 preprocessing_num_workers: 8
 
 # SFT trainer config
 bf16: true
-do_eval: false #true
-eval_strategy: "no" #steps
+do_eval: false
+eval_strategy: "no"
 eval_steps: 100
-gradient_accumulation_steps: 4
+gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
-hub_model_id: deepseek-v2-lite-16b-chat-R1-Distill-batch8-ot114k #deepseek-moe-16b-chat-R1-Distill
+hub_model_id: deepseek-v2-lite-16b-chat-R1-Distill-ot114k-batch32 #deepseek-moe-16b-chat-R1-Distill
 hub_strategy: every_save
 learning_rate: 2.0e-05
 log_level: info
@@ -27,14 +28,13 @@ logging_steps: 5
 logging_strategy: steps
 lr_scheduler_type: cosine
 packing: true
-max_seq_length: 2048 #4096
+max_seq_length: 4096
 max_steps: -1
 num_train_epochs: 1
-output_dir: data/deepseek-v2-lite-16b-chat-Open-R1-Distill-batch8-ot114k #data/deepseek-moe-16b-chat-Open-R1-Distill
+output_dir: data/deepseek-v2-lite-16b-chat-R1-Distill-ot114k-batch32 #data/deepseek-moe-16b-chat-Open-R1-Distill
 overwrite_output_dir: true
-packing: true
 per_device_eval_batch_size: 2
-per_device_train_batch_size: 2
+per_device_train_batch_size: 4
 push_to_hub: true
 report_to:
 - wandb

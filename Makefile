@@ -37,6 +37,9 @@ evaluate:
 		--push-to-hub \
 		--results-org Lansechen
 
+# lighteval vllm $$MODEL_ARGS "lighteval|$(TASK)|8|0" \
+#         --output-dir="./evals/"
+
 # Example usage:
 # Single GPU:
 #   make evaluate MODEL=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B TASK=aime24

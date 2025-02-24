@@ -8,11 +8,11 @@ attn_implementation: flash_attention_2
 dataset_name: open-r1/OpenR1-Math-220k
 dataset_configs:
 - all
+dataset_config: all
 dataset_train_split: train
 preprocessing_num_workers: 8
 
 # SFT trainer config
-#dataset_text_field: 'prompt'
 bf16: true
 do_eval: false
 eval_strategy: "no"
