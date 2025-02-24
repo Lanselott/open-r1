@@ -28,17 +28,12 @@ evaluate:
 		fi \
 	),))
 	$(if $(filter tensor,$(PARALLEL)),export VLLM_WORKER_MULTIPROC_METHOD=spawn &&,) \
-	MODEL_ARGS="pretrained=$(MODEL),dtype=bfloat16,$(PARALLEL_ARGS),max_model_length=32768,gpu_memory_utilisation=0.8,trust_remote_code=True" && \
+	MODEL_ARGS="pretrained=$(MODEL),dtype=bfloat16,$(PARALLEL_ARGS),max_model_length=32768,gpu_memory_utilization=0.8" && \
 	lighteval vllm $$MODEL_ARGS "custom|$(TASK)|0|0" \
 		--custom-tasks src/open_r1/evaluate.py \
 		--use-chat-template \
 		--system-prompt="Please reason step by step, and put your final answer within \boxed{}." \
-		--output-dir data/evals/$(MODEL) \
-		--push-to-hub \
-		--results-org Lansechen
-
-# lighteval vllm $$MODEL_ARGS "lighteval|$(TASK)|8|0" \
-#         --output-dir="./evals/"
+		--output-dir data/evals/$(MODEL)
 
 # Example usage:
 # Single GPU:
