@@ -27,7 +27,7 @@ logging_steps: 5
 logging_strategy: steps
 lr_scheduler_type: cosine
 packing: true
-max_seq_length: 4096
+max_length: 4096
 max_steps: -1
 num_train_epochs: 2
 output_dir: data/Qwen2.5-7B-Open-R1-Distill

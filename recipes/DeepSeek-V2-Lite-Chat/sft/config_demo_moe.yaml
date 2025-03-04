@@ -27,7 +27,7 @@ logging_steps: 5
 logging_strategy: steps
 lr_scheduler_type: cosine
 packing: true
-max_seq_length: 2048 #4096
+max_length: 2048 #4096
 max_steps: -1
 num_train_epochs: 1
 output_dir: data/deepseek-v2-lite-16b-chat-Open-R1-Distill-batch4 #data/deepseek-moe-16b-chat-Open-R1-Distill

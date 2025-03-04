@@ -29,7 +29,7 @@ logging_steps: 5
 logging_strategy: steps
 lr_scheduler_type: cosine
 packing: true
-max_seq_length: 4096
+max_length: 4096
 max_steps: -1
 num_train_epochs: 1
 output_dir: data/OLMoE-1B-7B-0125-Instruct-Distill-or-math220k-batch32
