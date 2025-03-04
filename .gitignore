@@ -49,6 +49,8 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+unsloth_compiled_cache/
+.litellm_cache/
 cover/
 
 # Translations
