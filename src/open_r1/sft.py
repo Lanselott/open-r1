@@ -108,6 +108,9 @@ def main(script_args, training_args, model_args):
     tokenizer = get_tokenizer(model_args, training_args)
     tokenizer.pad_token = tokenizer.eos_token
 
+    # if training_args.add_think_tokens:
+    # tokenizer.add_tokens(["<|begin_of_thought|>", "<|end_of_thought|>", "<|begin_of_solution|>", "<|end_of_solution|>"])
+
     ###################
     # Model init kwargs
     ###################
