@@ -38,24 +38,16 @@ evaluate:
 	),))
 	$(if $(filter tensor,$(PARALLEL)),export VLLM_WORKER_MULTIPROC_METHOD=spawn &&,) \
 	MODEL_ARGS="pretrained=$(MODEL),dtype=bfloat16,$(PARALLEL_ARGS),max_model_length=32768,gpu_memory_utilization=0.8,trust_remote_code=True,\
-	generation_parameters={max_new_tokens:32768,temperature:1.0,top_p:1.0}" && \
-    if [ "$(TASK)" = "lcb" ]; then \
-		lighteval vllm $$MODEL_ARGS "extended|lcb:codegeneration|0|0" \
-			--use-chat-template \
-			--output-dir data/evals/$(MODEL); \
-			--save-details \
-            --push-to-hub \
-            --results-org Lansechen
-	else \
-        lighteval vllm $$MODEL_ARGS "custom|$(TASK)|$(SHOT)|0" \
-            --custom-tasks src/open_r1/evaluate.py \
-            --use-chat-template \
-            --system-prompt="Please reason step by step, and put your final answer within \boxed{}." \
-            --output-dir data/evals/$(MODEL) \
-            --save-details \
-            --push-to-hub \
-            --results-org Lansechen
-    fi
+	generation_parameters={max_new_tokens:32768,temperature:0.1,top_p:1.0}" && \
+	lighteval vllm $$MODEL_ARGS "custom|$(TASK)|$(SHOT)|0" \
+		--custom-tasks src/open_r1/evaluate.py \
+		--use-chat-template \
+		--system-prompt="Please reason step by step, and put your final answer within \boxed{}." \
+		--output-dir data/evals/$(MODEL) \
+		--save-details \
+		--push-to-hub \
+		--results-org Lansechen
+
 evaluatebase:
 	$(eval PARALLEL_ARGS := $(if $(PARALLEL),$(shell \
 		if [ "$(PARALLEL)" = "data" ]; then \

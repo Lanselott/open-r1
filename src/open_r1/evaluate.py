@@ -29,6 +29,11 @@ from lighteval.utils.language import Language
 
 import lighteval.tasks.default_prompts as prompt
 
+# import time
+# from lighteval.tasks import lighteval_task
+#
+# le_task = lighteval_task()
+# le_task.cache_dir = f"./le_cache/{time.time()}"
 # Prompt template adapted from
 # - simple-evals: https://github.com/openai/simple-evals/blob/6e84f4e2aed6b60f6a0c7b8f06bbbf4bfde72e58/math_eval.py#L17
 # - Llama 3: https://huggingface.co/datasets/meta-llama/Llama-3.2-1B-Instruct-evals/viewer/Llama-3.2-1B-Instruct-evals__math__details?views%5B%5D=llama_32_1b_instruct_evals__math__details

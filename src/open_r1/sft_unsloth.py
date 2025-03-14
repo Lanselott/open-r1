@@ -47,8 +47,10 @@ from datasets import load_dataset
 from transformers import set_seed
 from transformers.trainer_utils import get_last_checkpoint
 
+from unsloth import FastLanguageModel
+
 from open_r1.configs import SFTConfig
-from open_r1.utils import get_tokenizer
+# from open_r1.utils import get_tokenizer
 from open_r1.utils.callbacks import get_callbacks
 from open_r1.utils.wandb_logging import init_wandb_training
 from trl import (
@@ -60,7 +62,6 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -105,11 +106,8 @@ def main(script_args, training_args, model_args):
     ################
     # Load tokenizer
     ################
-    tokenizer = get_tokenizer(model_args, training_args)
-    tokenizer.pad_token = tokenizer.eos_token
-
-    # if training_args.add_think_tokens:
-    tokenizer.add_tokens(["<think>", "</think>"])
+    # tokenizer = get_tokenizer(model_args, training_args)
+    # tokenizer.pad_token = tokenizer.eos_token
 
     ###################
     # Model init kwargs
@@ -130,13 +128,22 @@ def main(script_args, training_args, model_args):
     )
     training_args.model_init_kwargs = model_kwargs
 
+    # Load model
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_args.model_name_or_path,
+        max_seq_length=training_args.max_seq_length,
+        dtype=torch_dtype,  # None for auto detection. Float16 for Tesla T4, V100, Bfloat16 for Ampere+
+        load_in_4bit=False,  # Use 4bit quantization to reduce memory usage. Can be False
+        # token = "hf_...", # use one if using gated models like meta-llama/Llama-2-7b-hf
+    )
+
     ############################
     # Initialize the SFT Trainer
     ############################
     trainer = SFTTrainer(
-        model=model_args.model_name_or_path,
+        model=model,
         args=training_args,
-        train_dataset=dataset[script_args.dataset_train_split], #.shuffle(seed=42).take(2842),
+        train_dataset=dataset[script_args.dataset_train_split],
         eval_dataset=dataset[script_args.dataset_test_split] if training_args.eval_strategy != "no" else None,
         processing_class=tokenizer,
         peft_config=get_peft_config(model_args),

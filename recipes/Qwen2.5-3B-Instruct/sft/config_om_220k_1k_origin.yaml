@@ -5,9 +5,8 @@ torch_dtype: bfloat16
 attn_implementation: flash_attention_2
 
 # Data training arguments
-dataset_name: open-thoughts/OpenThoughts-114k
-dataset_configs:
-- all
+dataset_name: Lansechen/om220k_collection_simplified
+dataset_config: origin
 dataset_train_split: train
 dataset_num_proc: 48
 
@@ -15,11 +14,12 @@ dataset_num_proc: 48
 bf16: true
 do_eval: false
 eval_strategy: 'no'
+resume_from_checkpoint: false
 gradient_accumulation_steps: 8
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
-hub_model_id: Qwen2.5-3B-Instruct-Distill-ot114k-batch32-epoch3-8192-addthinktoken
+hub_model_id: Qwen2.5-3B-Instruct-Distill-om220k-1k-origin-batch32-epoch3-8192
 hub_strategy: every_save
 learning_rate: 5.0e-05
 log_level: info
@@ -32,7 +32,7 @@ packing: true
 max_length: 8192
 max_steps: -1
 num_train_epochs: 3
-output_dir: data/Qwen2.5-3B-Instruct-Distill-ot114k-batch32-epoch3-8192-addthinktoken
+output_dir: data/Qwen2.5-3B-Instruct-Distill-om220k-1k-origin-batch32-epoch3-8192
 overwrite_output_dir: true
 per_device_eval_batch_size: 4
 per_device_train_batch_size: 4
