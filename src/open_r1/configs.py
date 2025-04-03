@@ -50,6 +50,10 @@ class GRPOConfig(trl.GRPOConfig):
         default=None,
         metadata={"help": ("The project to store runs under.")},
     )
+    wandb_run_group: Optional[str] = field(
+        default=None,
+        metadata={"help": ("The group to store runs under.")},
+    )
 
 
 @dataclass
@@ -82,6 +86,10 @@ class SFTConfig(trl.SFTConfig):
     wandb_project: Optional[str] = field(
         default=None,
         metadata={"help": ("The project to store runs under.")},
+    )
+    wandb_run_group: Optional[str] = field(
+        default=None,
+        metadata={"help": ("The group to store runs under.")},
     )
 
 
@@ -153,4 +161,15 @@ class GRPOScriptArguments(trl.ScriptArguments):
         metadata={
             "help": "for each generation, evaluate these many test cases in parallel, then check if any of them failed (0 score): if so stop evaluating; otherwise continue with the next batch of test cases. Useful to avoid overloading the eval server + save time on wrong solutions"
         },
+    )
+    parallel_code_exec_per_proc: int = field(
+        default=2,
+        metadata={
+            "help": "Number of parallel E2B code executions per process. Default of 2 is suitable for the Free Hobby tier of E2B with 8 GPUs used for training."
+        },
+    )
+
+    dataset_prompt_column: str = field(
+        default="prompt",
+        metadata={"help": "Column to use as prompts for training."},
     )

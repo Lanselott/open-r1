@@ -20,6 +20,7 @@ do_eval: true
 eval_strategy: steps
 eval_steps: 100
 dataset_name: open-r1/OpenR1-Math-cn_k12-86k
+dataset_prompt_column: problem
 system_prompt: "You are a helpful AI Assistant that provides well-reasoned and detailed responses. You first think about the reasoning process as an internal monologue and then provide the user with the answer. Respond in the following format: <think>\n...\n</think>\n<answer>\n...\n</answer>"
 
 # GRPO trainer config
