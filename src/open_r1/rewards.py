@@ -68,6 +68,62 @@ def accuracy_reward(completions, solution, **kwargs):
 
     return rewards
 
+reward_levels = {"Level 1": 1,
+                 "Level 2": 2,
+                 "Level 3": 3,
+                 "Level 4": 4,
+                 "Level 5": 5,}
+
+def weighted_accuracy_reward(completions, solution, level, **kwargs):
+    """Reward function that checks if the completion is the same as the ground truth."""
+    contents = [completion[0]["content"] for completion in completions]
+    rewards = []
+    for content, sol, lv in zip(contents, solution, level):
+        if lv in reward_levels.keys():
+            lv_weight = reward_levels[lv]
+        else:
+            print(f"No valid level in dataset.")
+            lv_weight = 1
+
+        gold_parsed = parse(
+            sol,
+            extraction_mode="first_match",
+            extraction_config=[LatexExtractionConfig()],
+        )
+        if len(gold_parsed) != 0:
+            # We require the answer to be provided in correct latex (no malformed operators)
+            answer_parsed = parse(
+                content,
+                extraction_config=[
+                    LatexExtractionConfig(
+                        normalization_config=NormalizationConfig(
+                            nits=False,
+                            malformed_operators=False,
+                            basic_latex=True,
+                            equations=True,
+                            boxed="all",
+                            units=True,
+                        ),
+                        # Ensures that boxed is tried first
+                        boxed_match_priority=0,
+                        try_extract_without_anchor=False,
+                    )
+                ],
+                extraction_mode="first_match",
+            )
+            # Reward 1 if the content is the same as the ground truth, 0 otherwise
+            try:
+                reward = float(verify(answer_parsed, gold_parsed))
+            except Exception as e:
+                print(f"verify failed: {e}, answer: {answer_parsed}, gold: {gold_parsed}")
+                reward = 0.0
+        else:
+            # If the gold solution is not parseable, we reward 1 to skip this example
+            reward = 1.0
+            print("Failed to parse gold solution: ", sol)
+        rewards.append(reward * lv_weight)
+
+    return rewards
 
 def format_reward(completions, **kwargs):
     """Reward function that checks if the reasoning process is enclosed within <think> and </think> tags, while the final answer is enclosed within <answer> and </answer> tags."""
@@ -506,6 +562,7 @@ async def run_script(sbx: AsyncSandbox, script: str, language: str) -> float:
 
 def get_reward_funcs(script_args) -> list[Callable]:
     REWARD_FUNCS_REGISTRY = {
+        "weighted_accuracy": weighted_accuracy_reward,
         "accuracy": accuracy_reward,
         "format": format_reward,
         "reasoning_steps": reasoning_steps_reward,
