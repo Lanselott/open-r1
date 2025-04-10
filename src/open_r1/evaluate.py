@@ -100,6 +100,7 @@ def math_prompt_fn(line, task_name: str = None):
         gold_index=0,
     )
 
+
 def math_llama_prompt_fn(line, task_name: str = None):
     return Doc(
         task_name=task_name,
@@ -107,6 +108,7 @@ def math_llama_prompt_fn(line, task_name: str = None):
         choices=[line["solution"]],
         gold_index=0,
     )
+
 
 def aime_prompt_fn(line, task_name: str = None):
     return Doc(
@@ -195,7 +197,7 @@ gpqa_diamond = LightevalTaskConfig(
 math = LightevalTaskConfig(
     name="math:default",
     suite=["custom"],
-    prompt_function=math_prompt_fn,#prompt.math,
+    prompt_function=math_prompt_fn,  # prompt.math,
     hf_repo="DigitalLearningGmbH/MATH-lighteval",
     hf_subset="default",
     hf_avail_splits=["train", "test"],
@@ -209,7 +211,6 @@ math = LightevalTaskConfig(
     version=1,
 )
 
-
 # Add tasks to the table
 TASKS_TABLE = []
 TASKS_TABLE.append(aime24)
@@ -220,5 +221,7 @@ TASKS_TABLE.append(gpqa_diamond)
 
 # MODULE LOGIC
 if __name__ == "__main__":
+    import huggingface_hub
+
     print([t["name"] for t in TASKS_TABLE])
     print(len(TASKS_TABLE))

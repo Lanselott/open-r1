@@ -81,7 +81,8 @@ def main(script_args, training_args, model_args):
     tokenizer = get_tokenizer(model_args, training_args)
 
     # Get reward functions from the registry
-    reward_funcs = get_reward_funcs(script_args)
+    # reward_funcs = get_reward_funcs(tokenizer, script_args)
+    reward_funcs = get_reward_funcs(tokenizer=None, script_args=script_args)
 
     # Format into conversation
     def make_conversation(example, prompt_column: str = script_args.dataset_prompt_column):

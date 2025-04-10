@@ -141,6 +141,26 @@ class GRPOScriptArguments(trl.ScriptArguments):
         default=1000,
         metadata={"help": "Maximum length for scaling"},
     )
+    log_min_value_wrong: float = field(
+        default=0.0,
+        metadata={"help": "Minimum reward for wrong answers"},
+    )
+    log_max_value_wrong: float = field(
+        default=-0.5,
+        metadata={"help": "Maximum reward for wrong answers"},
+    )
+    log_min_value_correct: float = field(
+        default=0.5,
+        metadata={"help": "Minimum reward for correct answers"},
+    )
+    log_max_value_correct: float = field(
+        default=1.0,
+        metadata={"help": "Maximum reward for correct answers"},
+    )
+    log_max_len: int = field(
+        default=1000,
+        metadata={"help": "Maximum length for scaling"},
+    )
     repetition_n_grams: int = field(
         default=3,
         metadata={"help": "Number of n-grams for repetition penalty reward"},
