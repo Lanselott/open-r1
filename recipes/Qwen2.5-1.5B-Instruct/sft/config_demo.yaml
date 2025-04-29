@@ -25,9 +25,11 @@ learning_rate: 2.0e-05
 log_level: info
 logging_steps: 5
 logging_strategy: steps
-lr_scheduler_type: cosine
-packing: true
-max_length: 4096
+lr_scheduler_type: cosine_with_min_lr
+lr_scheduler_kwargs:
+  min_lr_rate: 0.1
+packing: false
+max_length: 16384
 max_steps: -1
 num_train_epochs: 1
 output_dir: data/Qwen2.5-3B-Open-R1-Distill
@@ -39,4 +41,5 @@ report_to:
 - wandb
 save_strategy: "no"
 seed: 42
-warmup_ratio: 0.1
+use_liger_kernel: true
+warmup_ratio: 0.05

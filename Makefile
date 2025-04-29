@@ -9,7 +9,7 @@ check_dirs := src tests
 # dev dependencies
 install:
 	uv venv openr1 --python 3.11 && . openr1/bin/activate && uv pip install --upgrade pip
-	uv pip install vllm==0.7.2
+	uv pip install vllm==0.8.4
 	uv pip install setuptools
 	uv pip install flash-attn --no-build-isolation
 	GIT_LFS_SKIP_SMUDGE=1 uv pip install -e ".[dev]"
@@ -40,6 +40,7 @@ evaluate:
 		fi \
 	),))
 	$(if $(filter tensor,$(PARALLEL)),export VLLM_WORKER_MULTIPROC_METHOD=spawn &&,) \
+
 	MODEL_ARGS="pretrained=$(MODEL),dtype=bfloat16,$(PARALLEL_ARGS),max_model_length=2048,max_num_batched_tokens=2048,gpu_memory_utilization=0.8,trust_remote_code=True,\
 	generation_parameters={max_new_tokens:2048,temperature:0.0,top_p:1.0}" && \
 	lighteval vllm $$MODEL_ARGS "custom|$(TASK)|0|0" \
