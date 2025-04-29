@@ -267,6 +267,7 @@ def get_cosine_scaled_reward(
     min_value_correct: float = 0.5,
     max_value_correct: float = 1.0,
     max_len: int = 1000,
+    require_reasoning: bool = True
 ):
     def cosine_scaled_reward(completions, solution, **kwargs):
         """Reward function that scales based on completion length using a cosine schedule.
@@ -287,8 +288,20 @@ def get_cosine_scaled_reward(
         """
         contents = [completion[0]["content"] for completion in completions]
         rewards = []
+        correct_list = []
+        content_list = []
+        sample_num = len(contents)
+        correct_count = 0
 
-        for content, sol in zip(contents, solution):
+        if require_reasoning:
+            pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,)"
+            matches = [len(re.findall(pattern, content)) for content in contents]
+
+            reasoning_weights = [float(min(1.0, count / 3)) for count in matches]
+        else:
+            reasoning_weights = None
+
+        for _, (content, sol) in enumerate(zip(contents, solution)):
             gold_parsed = parse(sol, extraction_mode="first_match", extraction_config=[LatexExtractionConfig()])
             if len(gold_parsed) == 0:
                 rewards.append(None)  # Skip unparseable examples
@@ -304,7 +317,7 @@ def get_cosine_scaled_reward(
                             malformed_operators=False,
                             basic_latex=True,
                             equations=True,
-                            boxed=True,
+                            boxed="all",
                             units=True,
                         ),
                         boxed_match_priority=0,
@@ -317,20 +330,86 @@ def get_cosine_scaled_reward(
             try:
                 is_correct = verify(gold_parsed, answer_parsed)
                 _reward = float(is_correct)
+
+                if is_correct:
+                    correct_count += 1
+
             except Exception as e:
                 print(f"verify failed: {e}, answer: {answer_parsed}, gold: {gold_parsed}")
                 is_correct = None
 
+            correct_list.append(is_correct)
+            content_list.append(content)
+
+        assert len(correct_list) == len(content_list)
+
+        correct_ratio = float(correct_count / sample_num)
+        print(f"correct ratio is : {correct_ratio}.")
+
+        penalty_weight = 1
+
+        for index, (content, is_correct) in enumerate(zip(content_list, correct_list)):
             if tokenizer is not None:
                 gen_len = len(tokenizer(content)['input_ids'])
             else:
                 gen_len = len(content)
 
-            # Apply cosine scaling based on length
-            progress = min(gen_len / max_len, 1)
-            cosine = math.cos(progress * math.pi)
+            '''
+            if correct_ratio < 1 / 5: #0426 version / 0428 config_cosine_0428.yaml
+                if is_correct:
+                    penalty_weight = 4
+                elif not is_correct:
+                    penalty_weight = 1 / 2 #1
+                print("Hard problem.")
+            elif correct_ratio >= 1 / 5 and correct_ratio < 4 / 5:
+                penalty_weight = 2
+                print("Medium problem.")
+            elif correct_ratio >= 4 / 5:
+                if is_correct:
+                    penalty_weight = 1 / 2 #1
+                elif not is_correct:
+                    penalty_weight = 4
+                print("Easy problem.")
 
-            print(f"gen_len: {gen_len} and max_len: {max_len}")
+            '''
+            if correct_ratio < 1 / 5: #0427 version; config_cosine_without_reasoning_weight_without_repetition_penalty.yaml
+                if is_correct:
+                    penalty_weight = 4
+                elif not is_correct:
+                    penalty_weight = 1 / 2 #1
+                    
+                print("lv 5 problem.")
+            elif correct_ratio >= 1 / 5 and correct_ratio < 2 / 5:
+                if is_correct:
+                    penalty_weight = 3
+                elif not is_correct:
+                    penalty_weight = 1
+                    
+                print("lv 4 problem.")
+            elif correct_ratio >= 2 / 5 and correct_ratio < 3 / 5:
+                penalty_weight = 2
+                    
+                print("lv 3 problem.")
+            elif correct_ratio >= 3 / 5 and correct_ratio < 4 / 5:
+                if is_correct:
+                    penalty_weight = 1
+                elif not is_correct:
+                    penalty_weight = 3
+                                        
+                print("lv 2 problem.")     
+            elif correct_ratio >= 4 / 5:
+                if is_correct:
+                    penalty_weight = 1 / 2 #1
+                elif not is_correct:
+                    penalty_weight = 4
+                    
+                print("lv 1 problem.")
+
+            # Apply cosine scaling based on length
+            progress = min((gen_len / max_len) / penalty_weight, 1)
+            cosine = math.cos(progress * math.pi)
+            print(f"progress: {progress}")
+            print(f"cosine: {cosine}")
 
             if is_correct is None:
                 reward = None
@@ -345,8 +424,17 @@ def get_cosine_scaled_reward(
 
                 reward = float(min_value + 0.5 * (max_value - min_value) * (1.0 + cosine))
 
+                # print(f"is_correct: {is_correct}")
+                # print(f"gen_len: {gen_len} and max_len: {max_len}")
+
+                if require_reasoning:
+                    reasoning_weight = reasoning_weights[index]
+                    print(f"reasoning_weight: {reasoning_weight}, reward before weighting: {reward}")
+                    reward += reasoning_weight
+
             rewards.append(reward)
 
+        print(f"rewards list: {rewards}.")
         return rewards
 
     return cosine_scaled_reward
@@ -472,6 +560,8 @@ def get_repetition_penalty_reward(ngram_size: int, max_penalty: float):
             scaling = 1 - len(ngrams) / total
             reward = scaling * max_penalty
             rewards.append(reward)
+
+        print(f"Repetition rewards: {rewards}.")
         return rewards
 
     return repetition_penalty_reward
@@ -715,6 +805,7 @@ def get_reward_funcs(tokenizer, script_args) -> list[Callable]:
             min_value_correct=script_args.cosine_min_value_correct,
             max_value_correct=script_args.cosine_max_value_correct,
             max_len=script_args.cosine_max_len,
+            require_reasoning=script_args.cosine_require_reasoning,
         ),
         "log": get_log_scaled_reward(
             min_value_wrong=script_args.log_min_value_wrong,

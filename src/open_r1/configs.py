@@ -122,7 +122,7 @@ class GRPOScriptArguments(trl.ScriptArguments):
         },
     )
     cosine_min_value_wrong: float = field(
-        default=0.0,
+        default=-1.0,
         metadata={"help": "Minimum reward for wrong answers"},
     )
     cosine_max_value_wrong: float = field(
@@ -141,8 +141,12 @@ class GRPOScriptArguments(trl.ScriptArguments):
         default=1000,
         metadata={"help": "Maximum length for scaling"},
     )
+    cosine_require_reasoning: bool = field(
+        default=True,
+        metadata={"help": "Apply reasoning weight in cosine reward"},
+    )
     log_min_value_wrong: float = field(
-        default=0.0,
+        default=-1.0,
         metadata={"help": "Minimum reward for wrong answers"},
     )
     log_max_value_wrong: float = field(
